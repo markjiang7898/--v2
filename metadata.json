@@ -1,0 +1,5 @@
+{
+  "name": "图片AI处理工作台",
+  "description": "A comprehensive AI image processing workbench featuring Colorization, Cartoon Transformation, Text-to-Image generation, and Watermark Removal using Gemini 2.5.",
+  "requestFramePermissions": []
+}
