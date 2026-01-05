@@ -72,24 +72,24 @@ export const generateImageContent = async (
   imageFile: File | null,
   textPrompt: string
 ): Promise<string> => {
-  const apiKey = process.env.API_KEY;
+  // 安全地获取 API Key
+  const apiKey = (window as any).process?.env?.API_KEY || (process as any).env?.API_KEY;
+  
   if (!apiKey) {
-    throw new Error("API_KEY 未配置，请关联付费密钥。");
+    throw new Error("API_KEY 未配置。请在 Vercel 控制台的 Environment Variables 中添加 API_KEY 变量并重新部署。");
   }
 
   const ai = new GoogleGenAI({ apiKey });
   
-  // 对于 4K 增强和特定风格，始终强制使用 Pro 级模型以保证风格化能力
   let modelName = 'gemini-2.5-flash-image';
   let config: any = undefined;
 
-  // 动漫风格、增强、去水印均建议使用 3-pro 以获得最佳效果
   if (tool === ToolType.CARTOON || tool === ToolType.ENHANCE_HD || tool === ToolType.REMOVE_WATERMARK) {
     modelName = 'gemini-3-pro-image-preview';
     config = {
       imageConfig: {
         imageSize: '4K',
-        aspectRatio: '1:1' // 默认值，后续如有需要可根据图像动态调整
+        aspectRatio: '1:1'
       }
     };
   }
@@ -106,7 +106,6 @@ export const generateImageContent = async (
       }
     });
 
-    // 如果是带图操作，动态计算宽高比
     const { width, height } = await getImageDimensions(imageFile);
     if (config?.imageConfig) {
       config.imageConfig.aspectRatio = getClosestAspectRatio(width, height);
@@ -132,10 +131,14 @@ export const generateImageContent = async (
       }
     }
 
-    throw new Error("响应中未包含图像数据。可能是由于图片内容触发了安全策略，请更换图片尝试。");
+    throw new Error("响应中未包含图像数据。可能是由于内容安全策略拦截或额度不足，请稍后重试。");
 
   } catch (error: any) {
     console.error("Gemini Error:", error);
+    // 针对 Vercel 常见的 401/403 错误提供更直观的反馈
+    if (error.message?.includes("401") || error.message?.includes("API_KEY")) {
+      throw new Error("API Key 无效或尚未在 Vercel 中生效，请确认环境变量配置并 Redeploy。");
+    }
     throw error;
   }
 };

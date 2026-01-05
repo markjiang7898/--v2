@@ -3,11 +3,15 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#4f46e5" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>NICE AI 图像工作台 | 专业级 AI 创作工具</title>
+    <!-- 兼容性脚本：防止 process 未定义导致的白屏 -->
+    <script>
+      window.process = window.process || { env: {} };
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -38,7 +42,7 @@
         background: #f1f1f1;
         border-radius: 10px;
       }
-      /* 适配微信底部安全区域 */
+      /* 适配移动端底部安全区域 */
       .safe-area-bottom {
         padding-bottom: env(safe-area-inset-bottom);
       }
